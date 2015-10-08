@@ -13,16 +13,5 @@ typedef struct __sinusoid_parameter_t {
     /* Phase in radians */
     sp_type_t ph; 
 } sinusoid_parameter_t;
-
-void sp_get_peaks 
-
-void sp_get_peak_params(sp_complex_type_t *frame,
-                        unsigned int frame_length,
-                        sinusoid_parameter_t *params,
-                        unsigned int max_params_length)
-{
-    /* ... */
-}
-
-    
+ 
 #endif /* SINUSOID_PARAMETERS_H */
