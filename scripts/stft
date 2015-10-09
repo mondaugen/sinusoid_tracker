@@ -1,0 +1,75 @@
+#! /usr/bin/env octave -qf
+N_ARGS = 4;
+args=argv();
+if (nargin != N_ARGS)
+    fprintf(stderr,...
+    ["usage: " program_name() " N H W format\n" ...
+     "N : FFT size\n" ...
+     "H : hop size\n" ...
+     "W : window type\n" ...
+     "    can be 'hanning', 'hamming'," ...
+     " 'blackman', 'bartlett', or 'rectangular'\n" ...
+     "format : the format of the output\n" ...
+     "         can be\n" ...
+     "         'raw' (doubles) or\n" ...
+     "         'human' (printf doubles of magnitude spectrum)"]);
+    exit();
+end
+N=str2num(args{1});
+H=str2num(args{2});
+W=args{3};
+x=zeros(N,1);
+format=args{4};
+switch (W)
+    case 'hanning'
+        w=hanning(N+1);
+    case 'hamming'
+        w=hamming(N+1);
+    case 'blackman'
+        w=blackman(N+1);
+    case 'bartlett'
+        w=bartlett(N+1);
+    case 'rectangular'
+        w=ones(N+1,1);
+end
+w=w(1:N);
+W_0=sum(w);
+% Load in enough samples to fill half of x so that the first frame's centre is
+% aligned with the first sample
+[tmp,count]=fread(stdin,N/2,'double');
+tmp(:);
+x((N/2+1):(N/2+count))=tmp;
+if (count != N/2)
+    x((N/2+1+count):N)=zeros(N/2-count,1);
+end
+do
+    X=fft(x.*w)/W_0;
+switch (format)
+    case ('human')
+        printf("%f ",abs(X));
+        printf("\n");
+    case ('raw')
+        for x=X
+            fwrite(stdout,real(x),'double');
+            fwrite(stdout,imag(x),'double');
+        end
+end
+    % shift over values
+    x(1:(N-H))=x((H+1):N);
+    [tmp,count]=fread(stdin,H,'double');
+    tmp(:);
+    x((N-H+1):(N-H+count))=tmp;
+until (count != H)
+% pad with zeros until buffer full
+x((N-H+1+count):N)=zeros(H-count,1);
+X=fft(x.*w)/W_0;
+switch (format)
+    case ('human')
+        printf("%f ",abs(X));
+        printf("\n");
+    case ('raw')
+        for x=X
+            fwrite(stdout,real(x),'double');
+            fwrite(stdout,imag(x),'double');
+        end
+end
