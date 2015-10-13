@@ -1,5 +1,5 @@
 function [T,F,A,Phi] = load_sinusoid_tracks(path)
-[fid,msg]=fopen(path,"r");
+[file,msg]=fopen(path,"r");
 if (file == -1)
     error(['Error opening file: ' path msg]);
 end
@@ -53,3 +53,4 @@ while (1)
         Phi{track_number} = [params(4)];
     end
 end
+fclose(file);

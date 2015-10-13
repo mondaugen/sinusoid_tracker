@@ -36,8 +36,8 @@ int main(int argc, char **argv)
                 argv[0]);
         return (-1);
     }
-    int n, N, H, first_frame;
-    size_t L[2], *L_k0, *L_k1, *L_k_tmp, l_k1;
+    int n, H, first_frame;
+    size_t L[2], *L_k0, *L_k1, *L_k_tmp, l_k1, N, N_read;
     double Fs;
     N = atoi(argv[1]);
     H = atoi(argv[2]);
@@ -63,11 +63,14 @@ int main(int argc, char **argv)
     first_frame = 1;
     track_nodes_k0 = &track_nodes[0];
     track_nodes_k1 = &track_nodes[N];
-    while (fread(X,sizeof(complex double),(size_t)N,stdin) == N) {
+    while ((N_read = fread(X,sizeof(complex double),(size_t)N,stdin)) == N) {
+        fprintf(stderr,"N read: %lu\n",N_read);
+        fprintf(stderr,"Time: %f\n",t);
         for (n = 0; n < N; n++) {
             X_mag[n] = cabs(X[n]);
         }
         mark_maxima(X_mag,N,maxima,L_k1);
+        fprintf(stderr,"N maxima: %lu\n",*L_k1);
         sort_maxima(maxima,*L_k1);
         for (l_k1 = 0; l_k1 < *L_k1; l_k1++) {
             track_nodes_k1[l_k1].p.A = *maxima[l_k1];

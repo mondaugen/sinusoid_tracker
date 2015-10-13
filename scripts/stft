@@ -34,10 +34,12 @@ switch (W)
 end
 w=w(1:N);
 W_0=sum(w);
+% Space to interleave real and imaginary parts
+X_=zeros(2*N,1);
 % Load in enough samples to fill half of x so that the first frame's centre is
 % aligned with the first sample
 [tmp,count]=fread(stdin,N/2,'double');
-tmp(:);
+tmp=tmp(:);
 x((N/2+1):(N/2+count))=tmp;
 if (count != N/2)
     x((N/2+1+count):N)=zeros(N/2-count,1);
@@ -49,15 +51,15 @@ switch (format)
         printf("%f ",abs(X));
         printf("\n");
     case ('raw')
-        for x=X
-            fwrite(stdout,real(x),'double');
-            fwrite(stdout,imag(x),'double');
-        end
+        X_(1:2:end)=real(X);
+        X_(2:2:end)=imag(X);
+%        fprintf(stderr,'len: %d\n',length(X_));
+        fwrite(stdout,X_,'double');
 end
     % shift over values
     x(1:(N-H))=x((H+1):N);
     [tmp,count]=fread(stdin,H,'double');
-    tmp(:);
+    tmp=tmp(:);
     x((N-H+1):(N-H+count))=tmp;
 until (count != H)
 % pad with zeros until buffer full
@@ -68,8 +70,8 @@ switch (format)
         printf("%f ",abs(X));
         printf("\n");
     case ('raw')
-        for x=X
-            fwrite(stdout,real(x),'double');
-            fwrite(stdout,imag(x),'double');
-        end
+        X_(1:2:end)=real(X);
+        X_(2:2:end)=imag(X);
+%        fprintf(stderr,'len: %d\n',length(X_));
+        fwrite(stdout,X_,'double');
 end
