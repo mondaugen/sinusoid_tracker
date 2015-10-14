@@ -51,7 +51,7 @@ void sat_assign_nums(sinusoid_analy_track_node_t *track_nodes_k0,
     sinusoid_analy_track_node_t *unmatched_k0[L_k0],
                                 *unmatched_k1[L_k1];
     sat_assign_nums_candidate_t candidates[opt->max_candidates];
-    int l_k0, l_k1, n_candidates = 0;
+    int l_k0, l_k1, n_candidates;
     for (l_k0 = 0; l_k0 < L_k0; l_k0++) {
         unmatched_k0[l_k0] = &track_nodes_k0[l_k0];
     }
@@ -62,6 +62,7 @@ void sat_assign_nums(sinusoid_analy_track_node_t *track_nodes_k0,
         if (unmatched_k0[l_k0] == NULL) {
             continue;
         }
+        n_candidates = 0;
         for (l_k1 = 0; l_k1 < L_k1; l_k1++) {
             /* Find candidates */
             if (unmatched_k1[l_k1] == NULL) {
@@ -73,6 +74,9 @@ void sat_assign_nums(sinusoid_analy_track_node_t *track_nodes_k0,
                 candidates[n_candidates].pp_track_node = &unmatched_k1[l_k1];
                 candidates[n_candidates].distance = _distance;
                 n_candidates++;
+                if (n_candidates > opt->max_candidates) {
+                    l_k1 = L_k1; /* break for loop */
+                }
             }
         }
         /* Sort candidates in reverse order (largest delta comes first in array,
