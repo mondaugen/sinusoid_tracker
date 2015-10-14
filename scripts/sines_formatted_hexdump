@@ -1,0 +1,2 @@
+hexdump -ve '"Time: " 1/8 "%f " "sec\n" "\t" "A: " 1/8 "%f" "\n\t" "W: " 1/8 \
+    "%f" "\n\t" "Phi: " 1/8 "%f" "\n\t" "Track: " 2/4 "%d " "\n"' $1
