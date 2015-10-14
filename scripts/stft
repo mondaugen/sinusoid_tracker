@@ -1,3 +1,4 @@
+#! /usr/bin/octave -qf
 #! /usr/bin/env octave -qf
 N_ARGS = 4;
 args=argv();
