@@ -75,18 +75,20 @@ int main(int argc, char **argv)
         fprintf(stderr,"N maxima: %lu\n",*L_k1);
         sort_maxima(maxima,*L_k1);
         for (l_k1 = 0; l_k1 < *L_k1; l_k1++) {
-            if (track_nodes_k1[l_k1].p.A < A) {
+            if (*maxima[l_k1] < A) {
+                fprintf(stderr,"p.A: %f\n",*maxima[l_k1]);
                 *L_k1 = l_k1;
             } else {
-            track_nodes_k1[l_k1].p.A = *maxima[l_k1];
-            track_nodes_k1[l_k1].p.w = ((double)(maxima[l_k1] - X_mag))
-                / ((double)N) * 2. * M_PI;
-            track_nodes_k1[l_k1].p.ph = carg(X[maxima[l_k1] - X_mag]);
-            track_nodes_k1[l_k1].track_number = (first_frame == 1) ?
-                sat_assign_nums_opt.get_new_track_number(&sat_assign_nums_opt) :
-                -1;
+                track_nodes_k1[l_k1].p.A = *maxima[l_k1];
+                track_nodes_k1[l_k1].p.w = ((double)(maxima[l_k1] - X_mag))
+                    / ((double)N) * 2. * M_PI;
+                track_nodes_k1[l_k1].p.ph = carg(X[maxima[l_k1] - X_mag]);
+                track_nodes_k1[l_k1].track_number = (first_frame == 1) ?
+                    sat_assign_nums_opt.get_new_track_number(&sat_assign_nums_opt) :
+                    -1;
             }
         }
+        fprintf(stderr,"L_k1: %lu\n",*L_k1);
         if (first_frame == 0) {
             sat_assign_nums(track_nodes_k0,
                             (int)*L_k0,
