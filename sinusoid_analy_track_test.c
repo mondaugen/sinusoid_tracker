@@ -121,11 +121,3 @@ int main(int argc, char **argv)
     }
     return (0);
 }
-/*
- * ary - pointer to first datum in array
- * ary_len - if N is the FFT size that produced the ary, this should indeed be
- *           N, as we may want to wrap around to negative frequencies to do interpolation
-
-void parabolic_interp_max(complex double *ary, size_t ary_len, complex double *pmax)
-{
-

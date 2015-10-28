@@ -1,4 +1,5 @@
 #include "spectrum.h" 
+#include <math.h> 
 
 #ifdef DEBUG
  #include <assert.h>
@@ -32,7 +33,7 @@ void parabolic_interp_max(const double x_1,
 }
 
 /*
- * ary - pointer to first datum in array
+ * ary     - pointer to first datum in magnitude spectrum array
  * ary_len - if N is the FFT size that produced the ary, this should indeed be
  *           N, as we may want to wrap around to negative frequencies to do interpolation
  * pmax    - pointer to maximum in array. The array will probably be symmetric
@@ -46,7 +47,7 @@ void parabolic_interp_max(const double x_1,
  * opt     - 0: interpolate on magnitude spectrum
  *           1: interpolate on log spectrum
  */
-void parabolic_interp_max_mag_spect(const complex double *ary,
+void parabolic_interp_max_mag_spect(const double *ary,
                                     const size_t ary_len,
                                     const complex double *pmax,
                                     double *result,
@@ -61,18 +62,18 @@ void parabolic_interp_max_mag_spect(const complex double *ary,
     if (pmax == ary) {
         /* x[0] is the start of the array, get x[-1] from the end of the array
          * (wrap around). */
-        x_1 = cabs(ary[ary_len-1]);
+        x_1 = ary[ary_len-1];
     } else {
-        x_1 = cabs(pmax[-1]);
+        x_1 = pmax[-1];
     }
     if (pmax == &ary[ary_len-1]) {
         /* x[0] is the last index in the array, get x[1] from the start of the
          * array. */
-        x1 = cabs(ary[0]);
+        x1 = ary[0];
     } else {
-        x1 = cabs(pmax[1]);
+        x1 = pmax[1];
     }
-    x0 = cabs(pmax[0]);
+    x0 = pmax[0];
     if (opt == 1) {
         x0  = log(x0);
         x1  = log(x1);
@@ -83,7 +84,7 @@ void parabolic_interp_max_mag_spect(const complex double *ary,
         result_ = exp(result);
     }
     /* make offset into index from beginning of ary*/
-    index_ = (pmax - ary) + index_;
+    index_ += (pmax - ary);
     /* Keep within array bounds */
     if (index_ >= ary_len) {
         index_ -= ary_len;
