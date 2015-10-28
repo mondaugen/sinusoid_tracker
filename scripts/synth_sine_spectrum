@@ -1,0 +1,26 @@
+#! /usr/bin/octave -qf
+NARGS=6;
+args=argv();
+nargs=length(args);
+if (nargs != NARGS)
+    fprintf(stderr,["Args are:\n" ...
+        "length frequency phase samplerate padding window.\n"]);
+    exit(-1);
+end
+N=str2num(args{1});
+freq=str2num(args{2});
+phase=str2num(args{3});
+sr=str2num(args{4});
+padding=str2num(args{5});
+w=eval(sprintf("%s(%d)",args{6},N));
+x=exp(1i*(2*pi*(0:(N-1))/N*freq/sr + phase));
+x=x(:);
+x=x.*w;
+x=[x;zeros(padding,1)];
+X=fft(x);
+X_real=real(X);
+X_imag=imag(X);
+Y=zeros(length(X_real)*2,1);
+Y(1:2:end)=X_real;
+Y(2:2:end)=X_imag;
+fwrite(stdout,Y,"double");
