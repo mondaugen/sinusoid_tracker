@@ -1,0 +1,1 @@
+gcc sinusoid_analy_track_interp_max_test.c spectrum.c ../zero_crossing/{mark_zeroxs,mark_maxima}.c ./sinusoid_analy_track.c -I. -I../zero_crossing -o sinusoid_analy_track_interp_max_test.elf -lm

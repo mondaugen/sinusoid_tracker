@@ -1,5 +1,5 @@
-#! /usr/bin/env octave -qf
-N_ARGS = 4;
+#! octave -qf
+N_ARGS = 5;
 args=argv();
 if (nargin != N_ARGS)
     fprintf(stderr,...
@@ -9,30 +9,38 @@ if (nargin != N_ARGS)
      "W : window type\n" ...
      "    can be 'hanning', 'hamming'," ...
      " 'blackman', 'bartlett', or 'rectangular'\n" ...
+     "L : window length\n" ...
      "format : the format of the output\n" ...
      "         can be\n" ...
      "         'raw' (doubles) or\n" ...
      "         'human' (printf doubles of magnitude spectrum)"]);
-    exit();
+    exit(-1);
 end
 N=str2num(args{1});
 H=str2num(args{2});
 W=args{3};
+L=str2num(args{4});
 x=zeros(N,1);
-format=args{4};
+format=args{5};
+if (L > N)
+    fprintf(stderr,'Window sizes greater than N not yet supported.');
+    exit(-1);
+end
 switch (W)
     case 'hanning'
-        w=hanning(N+1);
+        w=hanning(L+1);
     case 'hamming'
-        w=hamming(N+1);
+        w=hamming(L+1);
     case 'blackman'
-        w=blackman(N+1);
+        w=blackman(L+1);
     case 'bartlett'
-        w=bartlett(N+1);
+        w=bartlett(L+1);
     case 'rectangular'
-        w=ones(N+1,1);
+        w=ones(L+1,1);
 end
-w=w(1:N);
+w=w(1:L);
+% pad with zeros
+w=[w;zeros(N-L,1)];
 W_0=sum(w);
 % Space to interleave real and imaginary parts
 X_=zeros(2*N,1);

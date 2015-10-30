@@ -2,3 +2,4 @@
 *.dSYM
 *octave-workspace
 sounds*
+*.elf

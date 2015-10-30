@@ -13,7 +13,9 @@ phase=str2num(args{3});
 sr=str2num(args{4});
 padding=str2num(args{5});
 w=eval(sprintf("%s(%d)",args{6},N));
-x=exp(1i*(2*pi*(0:(N-1))/N*freq/sr + phase));
+% normalize window
+w=w./(sum(w));
+x=exp(1i*(2*pi*(0:(N-1))*freq/sr + phase));
 x=x(:);
 x=x.*w;
 x=[x;zeros(padding,1)];

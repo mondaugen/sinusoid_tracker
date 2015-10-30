@@ -1,5 +1,6 @@
 #ifndef SPECTRUM_H
 #define SPECTRUM_H 
+#include <stddef.h> 
 #include <complex.h>
 
 typedef complex double spect_complex_type_t;
@@ -15,7 +16,7 @@ void parabolic_interp_max(const double x_1,
                           double *offset);
 void parabolic_interp_max_mag_spect(const double *ary,
                                     const size_t ary_len,
-                                    const complex double *pmax,
+                                    const double *pmax,
                                     double *result,
                                     double *index,
                                     unsigned opt);

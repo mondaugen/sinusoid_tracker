@@ -49,7 +49,7 @@ void parabolic_interp_max(const double x_1,
  */
 void parabolic_interp_max_mag_spect(const double *ary,
                                     const size_t ary_len,
-                                    const complex double *pmax,
+                                    const double *pmax,
                                     double *result,
                                     double *index,
                                     unsigned opt)
@@ -81,7 +81,7 @@ void parabolic_interp_max_mag_spect(const double *ary,
     }
     parabolic_interp_max(x_1,x0,x1,&result_,&index_);
     if (opt == 1) {
-        result_ = exp(result);
+        result_ = exp(result_);
     }
     /* make offset into index from beginning of ary*/
     index_ += (pmax - ary);
