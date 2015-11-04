@@ -19,9 +19,7 @@
 #include "mark_maxima.h" 
 #include "sinusoid_analy_track.h" 
 
-#define N_ARGS 5
-
-#define MAX_DELTA 2. /* Frequencies must lie within an octave. */
+#define N_ARGS 6
 
 int main(int argc, char **argv)
 {
@@ -33,17 +31,21 @@ int main(int argc, char **argv)
                 "     This includes the spectrum up to the sampling frequency.\n"
                 "H  : The hop size or number of samples between sucessive frames.\n"
                 "Fs : The sampling rate in Hz.\n"
-                "A  : The minimum amplitude of a peak.\n",
+                "A  : The minimum amplitude of a peak.\n"
+                "e  : The extreme frequency ratio between two frequencies.\n"
+                "     Should be greater than 1.\n"
+                "     For example, 2.0 will connect frequencies at most an octave apart.\n",
                 argv[0]);
         return (-1);
     }
     int n, H, first_frame;
     size_t L[2], *L_k0, *L_k1, *L_k_tmp, l_k1, N, N_read;
-    double Fs, A;
+    double Fs, A, e;
     N = atoi(argv[1]);
     H = atoi(argv[2]);
     Fs = atof(argv[3]);
     A  = atof(argv[4]);
+    e  = atof(argv[5]);
     L_k0 = &L[0];
     L_k1 = &L[1];
     /* current time */
@@ -55,7 +57,7 @@ int main(int argc, char **argv)
     sinusoid_analy_track_node_t *track_nodes_k1, *track_nodes_k0, *track_nodes_tmp;
     sat_assign_nums_opt_t sat_assign_nums_opt = {
         .max_candidates = N,
-        .max_delta      = MAX_DELTA,
+        .max_delta      = e,
         .distance       = sat_distance_freq_ratio,
         .within_delta   = sat_within_delta_freq_ratio,
         .compare_candidate = sat_assign_nums_candidate_compare,
@@ -66,21 +68,17 @@ int main(int argc, char **argv)
     track_nodes_k0 = &track_nodes[0];
     track_nodes_k1 = &track_nodes[N];
     while ((N_read = fread(X,sizeof(complex double),(size_t)N,stdin)) == N) {
-        fprintf(stderr,"N read: %lu\n",N_read);
-        fprintf(stderr,"Time: %f\n",t);
         for (n = 0; n < N; n++) {
             X_mag[n] = cabs(X[n]);
         }
         /* Only observe first half of spectrum when marking maxima */
         mark_maxima(X_mag,N/2,maxima,L_k1);
-        fprintf(stderr,"N maxima: %lu\n",*L_k1);
         sort_maxima(maxima,*L_k1);
         for (l_k1 = 0; l_k1 < *L_k1; l_k1++) {
             double mag, index, index_flr;
             complex double cmag;
             parabolic_interp_max_mag_spect(X_mag,N,maxima[l_k1],&mag,&index,1);
             if (mag < A) {
-                fprintf(stderr,"p.A: %f\n",mag);
                 *L_k1 = l_k1;
             } else {
                 track_nodes_k1[l_k1].p.A = mag;
@@ -99,7 +97,6 @@ int main(int argc, char **argv)
                     -1;
             }
         }
-        fprintf(stderr,"L_k1: %lu\n",*L_k1);
         if (first_frame == 0) {
             sat_assign_nums(track_nodes_k0,
                             (int)*L_k0,

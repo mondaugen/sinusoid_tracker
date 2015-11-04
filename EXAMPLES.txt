@@ -1,1 +1,1 @@
-cat ~/Documents/development/timbretoolbox/doc/example.raw | scripts/stft 4096 1024 hanning 1024 raw | ./sinusoid_analy_track_interp_max_test.elf 4096 1024 48000 0.01 | scripts/format_sinusoid_tracks_T_F > /tmp/sinusoid_tracks.dat
+cat ~/Documents/development/timbretoolbox/doc/example.raw | scripts/stft 4096 1024 hanning 1024 raw | ./sinusoid_analy_track_interp_max_test.elf 4096 1024 48000 0.01 2. | scripts/format_sinusoid_tracks_T_F > /tmp/sinusoid_tracks.dat
