@@ -135,3 +135,13 @@ void sat_assign_nums(sinusoid_analy_track_node_t *track_nodes_k0,
         unmatched_k1[l_k1]->track_number = opt->get_new_track_number(opt);
     }
 }
+
+/* Returns -1, 0, 1 if track number of a less-than, equal-to, or greater-than
+ * track number of b, resp. */
+int sat_track_number_compare(const void *a, const void *b)
+{
+    sinusoid_analy_track_node_t *_a, *_b;
+    _a = (sinusoid_analy_track_node_t*)a;
+    _b = (sinusoid_analy_track_node_t*)b;
+    return (_a->track_number > _b->track_number) - (_a->track_number < _b->track_number);
+}

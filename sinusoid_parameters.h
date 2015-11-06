@@ -1,7 +1,6 @@
 #ifndef SINUSOID_PARAMETERS_H
 #define SINUSOID_PARAMETERS_H 
 #include <complex.h> 
-#include "mark_zeroxs.h" 
 
 typedef double sp_type_t;
 typedef complex double sp_complex_type_t;

@@ -50,5 +50,6 @@ void sat_assign_nums(sinusoid_analy_track_node_t *track_nodes_k0,
                      sinusoid_analy_track_node_t *track_nodes_k1,
                      int L_k1,
                      sat_assign_nums_opt_t *opt);
+int sat_track_number_compare(const void *a, const void *b);
 
 #endif /* SINUSOID_ANALY_TRACK_H */
