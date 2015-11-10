@@ -1,0 +1,28 @@
+#!/bin/bash
+
+E_BADARGS=65
+
+if [[ $# -ne 7 ]]
+then
+
+cat <<EOF
+Parameters are:
+    Sampling rate
+    FFT size
+    Hop size
+    Window size
+    Amplitude threshold
+    Max freq delta
+    Filename
+EOF
+
+exit $E_BADARGS
+
+fi
+
+sox $7 -t f64 -r $1 -c 1 -\
+    | scripts/stft $2 $3 hanning $4 raw\
+    | ./sinusoid_analy_track_interp_max_test.elf $2 $3 $1 $5 $6\
+    | ./sinusoid_synth_tracks.elf $1 $1\
+    | sox -t f64 -c 1 -r $1 - -d
+

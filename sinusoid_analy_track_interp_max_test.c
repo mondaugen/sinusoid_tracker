@@ -21,6 +21,7 @@
 #include "spectrum.h" 
 
 #define N_ARGS 6
+#define PARAB_INTERP_AMP_THRESH 1e-6 /* Magnitude values below 80 dB always ignored */ 
 
 int main(int argc, char **argv)
 {
@@ -78,24 +79,31 @@ int main(int argc, char **argv)
         for (l_k1 = 0; l_k1 < *L_k1; l_k1++) {
             double mag, index, index_flr;
             complex double cmag;
-            parabolic_interp_max_mag_spect(X_mag,N,maxima[l_k1],&mag,&index,1);
-            if (mag < A) {
+            if (*maxima[l_k1] < PARAB_INTERP_AMP_THRESH) {
+                /* Interpolation is badly defined for really small amplitudes so
+                 * we don't carry it out in this case.
+                 */
                 *L_k1 = l_k1;
             } else {
-                track_nodes_k1[l_k1].p.A = mag;
-                track_nodes_k1[l_k1].p.w = index / ((double)N) * 2. * M_PI;
-                /* Phi(k) - pi(k-1.5) = Phi_0. 
-                 * This has not been tested thoroughly
-                 * make frequency positive (should be less than sampling rate)
-                 * */
-                index_flr = floor(index);
-                while (index_flr < 0) {
-                    index_flr += N;
+                parabolic_interp_max_mag_spect(X_mag,N,maxima[l_k1],&mag,&index,1);
+                if (mag < A) {
+                    *L_k1 = l_k1;
+                } else {
+                    track_nodes_k1[l_k1].p.A = mag;
+                    track_nodes_k1[l_k1].p.w = index / ((double)N) * 2. * M_PI;
+                    /* Phi(k) - pi(k-1.5) = Phi_0. 
+                     * This has not been tested thoroughly
+                     * make frequency positive (should be less than sampling rate)
+                     * */
+                    index_flr = floor(index);
+                    while (index_flr < 0) {
+                        index_flr += N;
+                    }
+                    track_nodes_k1[l_k1].p.ph = X[(int)index_flr] - M_PI * (index_flr - index);
+                    track_nodes_k1[l_k1].track_number = (first_frame == 1) ?
+                        sat_assign_nums_opt.get_new_track_number(&sat_assign_nums_opt) :
+                        -1;
                 }
-                track_nodes_k1[l_k1].p.ph = X[(int)index_flr] - M_PI * (index_flr - index);
-                track_nodes_k1[l_k1].track_number = (first_frame == 1) ?
-                    sat_assign_nums_opt.get_new_track_number(&sat_assign_nums_opt) :
-                    -1;
             }
         }
         if (first_frame == 0) {

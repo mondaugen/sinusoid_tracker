@@ -22,7 +22,7 @@ sp_type_t outbuf[OUTBUF_SIZE];
 int main (int argc, char **argv)
 {
     if (argc != N_ARGS) {
-        fprintf(stderr,"Usage:\n%s input_samplerate output_samplerate \n",argv[0]);
+        fprintf(stderr,"Usage:\n%s input_samplerate output_samplerate\n",argv[0]);
         return(-1);
     }
     sinusoid_analy_track_node_t *cur_track_nodes = track_nodes,
@@ -35,7 +35,9 @@ int main (int argc, char **argv)
            delta_time,
            Fs,
            Fs_in,
-           Ts;
+           Ts,
+           min_freq,
+           max_freq;
     Fs_in = atof(argv[1]);
     Fs = atof(argv[2]);
     Ts = 1./Fs;
@@ -125,7 +127,7 @@ int main (int argc, char **argv)
         delta_time = next_time - cur_time;
         n_samples = (size_t)(delta_time / Ts);
         if (n_samples > OUTBUF_SIZE) {
-            fprintf(stderr,"n_samples greater than OUTBUF_SIZE. Exiting.\n");
+            fprintf(stderr,"n_samples: %lu greater than OUTBUF_SIZE. Exiting.\n", n_samples);
             return(-1);
         }
         cur_num_track_nodes = 0;
