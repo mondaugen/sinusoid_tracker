@@ -1,1 +1,5 @@
 gcc sinusoid_analy_track_interp_max_test.c spectrum.c ../zero_crossing/{mark_zeroxs,mark_maxima}.c ./sinusoid_analy_track.c -I. -I../zero_crossing -o sinusoid_analy_track_interp_max_test.elf -lm
+
+gcc sinusoid_synth_tracks.c spectrum.c ../zero_crossing/{mark_zeroxs,mark_maxima}.c ./sinusoid_analy_track.c sinusoid_synth.c -I. -I../zero_crossing -o sinusoid_synth_tracks.elf -lm
+
+gcc sinusoid_synth_test.c sinusoid_synth.c -I. -o sinusoid_synth_test.elf -lm

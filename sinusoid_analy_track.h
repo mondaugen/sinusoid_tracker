@@ -4,6 +4,7 @@
 #include "sinusoid_parameters.h"  
 
 typedef struct __sinusoid_analy_track_node_t {
+    sp_type_t time;
     sinusoid_parameter_t p;
     int track_number;
 } sinusoid_analy_track_node_t;

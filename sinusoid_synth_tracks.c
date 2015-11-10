@@ -1,13 +1,14 @@
 #include <stdlib.h> 
 #include <stdio.h> 
 #include <string.h> 
+#include <math.h> 
 #include "sinusoid_parameters.h" 
 #include "sinusoid_analy_track.h" 
+#include "sinusoid_synth.h" 
 
-/* TODO: Read time and then the track! */
-
+#define N_ARGS 3 
 #define  MAX_NUM_TRACKS 1000
-#define  OUTBUF_SIZE    8192 
+#define  OUTBUF_SIZE    131072
 #define  swap_(a,b) do {\
         typeof(a) __tmp;\
         __tmp = a;\
@@ -18,19 +19,10 @@
 sinusoid_analy_track_node_t track_nodes[2*MAX_NUM_TRACKS];
 sp_type_t outbuf[OUTBUF_SIZE];
 
-void sinusoid_synth_osc(sp_type_t *buf,
-                        size_t N, 
-                        sp_type_t a0,
-                        sp_type_t a1,
-                        sp_type_t w0,
-                        sp_type_t w1,
-                        sp_type_t *phi,
-                        sp_type_t Ts);
-
 int main (int argc, char **argv)
 {
-    if (argc != 2) {
-        fprintf(stderr,"Usage:\n%s samplerate\n",argv[0]);
+    if (argc != N_ARGS) {
+        fprintf(stderr,"Usage:\n%s input_samplerate output_samplerate \n",argv[0]);
         return(-1);
     }
     sinusoid_analy_track_node_t *cur_track_nodes = track_nodes,
@@ -42,8 +34,10 @@ int main (int argc, char **argv)
            next_time = 0,
            delta_time,
            Fs,
+           Fs_in,
            Ts;
-    Fs = atof(argv[1]);
+    Fs_in = atof(argv[1]);
+    Fs = atof(argv[2]);
     Ts = 1./Fs;
     int done = 0, reading;
     while (!done) {
@@ -82,11 +76,11 @@ int main (int argc, char **argv)
                 w0 = cur_track_nodes[n].p.w;
             } else {
                 a0 = ptmp_node->p.A;
-                w0 = ptmp_node->p.w;
-                cur_track_nodes[n].p.phi = ptmp_node->p.ph;
+                w0 = ptmp_node->p.w*Fs_in;
+                cur_track_nodes[n].p.ph = ptmp_node->p.ph;
             }
             a1 = cur_track_nodes[n].p.A;
-            w1 = cur_track_nodes[n].p.w;
+            w1 = cur_track_nodes[n].p.w*Fs_in;
             phi = &cur_track_nodes[n].p.ph;
             sinusoid_synth_osc(outbuf,n_samples,a0,a1,w0,w1,phi,Ts); 
             if (ptmp_node) {
@@ -96,13 +90,13 @@ int main (int argc, char **argv)
         }
         /* fade out dead tracks */
         for (n = 0; n < prev_num_track_nodes; n++) {
-            if (prev_track_nodes[n].p.A = 0) {
+            if (prev_track_nodes[n].p.A == 0) {
                 continue;
             }
             a0 = prev_track_nodes[n].p.A;
             a1 = 0;
-            w0 = prev_track_nodes[n].p.w;
-            w1 = prev_track_nodes[n].p.w;
+            w0 = prev_track_nodes[n].p.w*Fs_in;
+            w1 = prev_track_nodes[n].p.w*Fs_in;
             phi = &prev_track_nodes[n].p.ph;
             sinusoid_synth_osc(outbuf,n_samples,a0,a1,w0,w1,phi,Ts); 
         }
@@ -113,13 +107,13 @@ int main (int argc, char **argv)
             /* fade out final tracks */
             memset(outbuf,0,sizeof(sp_type_t)*n_samples);
             for (n = 0; n < prev_num_track_nodes; n++) {
-                if (prev_track_nodes[n].p.A = 0) {
+                if (prev_track_nodes[n].p.A == 0) {
                     continue;
                 }
                 a0 = prev_track_nodes[n].p.A;
                 a1 = 0;
-                w0 = prev_track_nodes[n].p.w;
-                w1 = prev_track_nodes[n].p.w;
+                w0 = prev_track_nodes[n].p.w*Fs_in;
+                w1 = prev_track_nodes[n].p.w*Fs_in;
                 phi = &prev_track_nodes[n].p.ph;
                 sinusoid_synth_osc(outbuf,n_samples,a0,a1,w0,w1,phi,Ts); 
             }
@@ -139,27 +133,3 @@ int main (int argc, char **argv)
     }
     return(0);
 }
-
-/* w0, w1 in angular velocity */
-void sinusoid_synth_osc(sp_type_t *buf,
-                        size_t N, 
-                        sp_type_t a0,
-                        sp_type_t a1,
-                        sp_type_t w0,
-                        sp_type_t w1,
-                        *sp_type_t phi,
-                        sp_type_t Ts)
-{
-    sp_type_t a, a_inc, w, w_inc;
-    a_inc = (a1 - a0) / ((sp_type_t)N);
-    a = a0;
-    w_inc = (w1 - w0) / ((sp_type_t)N);
-    w = w0;
-    while (N--) {
-        *(buf++) += a*cos(*phi);
-        a += a_inc;
-        *phi += w*Ts;
-        w += w_inc;
-    }
-}
-

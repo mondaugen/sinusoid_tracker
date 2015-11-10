@@ -17,7 +17,8 @@
 #include <math.h> 
 
 #include "mark_maxima.h" 
-#include "sinusoid_analy_track.h" 
+#include "sinusoid_analy_track.h"
+#include "spectrum.h" 
 
 #define N_ARGS 6
 
@@ -108,9 +109,7 @@ int main(int argc, char **argv)
         }
         /* Store discovered track nodes */
         for (l_k1 = 0; l_k1 < *L_k1; l_k1++) {
-            /* Write time */
-            fwrite(&t,sizeof(double),1,stdout);
-            /* Write track data */
+            track_nodes_k1[l_k1].time = t;
             fwrite(&track_nodes_k1[l_k1],
                    sizeof(sinusoid_analy_track_node_t),
                    1,
